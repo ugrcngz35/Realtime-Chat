@@ -20,6 +20,7 @@ const io = socket(server);
 /** Nickname colors */
 
 const colors = ['#673ab7', '#4caf50', '#2196f3', '#9c27b0', '#ff5722', '#795548', '#404040'];
+var typers = [];
 
 io.on('connection', (socket) => {
 	const autocolor = colors[Math.floor(Math.random() * 7)];
@@ -34,11 +35,28 @@ io.on('connection', (socket) => {
 	});
 
 	socket.on('typing', () => {
+		typers.push(socket.id);
+		console.log(typers.length);
 		socket.broadcast.emit('someoneTyping', true);
 	});
 
-	socket.on('typingOver', () => {
-		socket.broadcast.emit('noTyping', true);
-	})
-})
+	socket.on('typingOver', (data) => {
+		var elemToRemove = typers.indexOf(data.id);
+		if(elemToRemove > -1){
+			typers.splice(elemToRemove, 1);
+		};
 
+		console.log(typers.length);
+		console.log(typers);
+		if(typers.length == 0){
+			io.sockets.emit('noTyping', true);
+		}
+	});
+
+	/** If typers left only one, disable typing animation for only left typer*/
+	socket.on('checkTypers', function(client){
+		if(typers.length == 1){
+			io.to(typers[0]).emit('typingOff');
+		}
+	});
+})

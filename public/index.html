@@ -131,7 +131,10 @@
 			socket.emit('messageSend', sendPackage);
 
 			lock = false;
-			socket.emit('typingOver');
+			socket.emit('typingOver', {id: socket.id});
+			socket.emit('checkTypers', {id: socket.id});
+
+			//Checking typers how much left or finding alone one
 		});
 
 		socket.on('messageGet', function(data){
@@ -159,7 +162,8 @@
 			if(messageText.value.length < 1)
 			{
 				lock = false;
-				socket.emit('typingOver');
+				socket.emit('typingOver', {id: socket.id});
+				socket.emit('checkTypers', {id: socket.id});
 			}
 		}
 
@@ -168,9 +172,14 @@
 		socket.on('someoneTyping', function(){
 			var typingMark = document.getElementById('someoneTyping');
 			typingMark.style.visibility = 'visible';
-		})
+		});
 
-		socket.on('noTyping', function(){
+		socket.on('noTyping', function(order){
+			var typingMark = document.getElementById('someoneTyping');
+			typingMark.style.visibility = 'hidden';
+		});
+
+		socket.on('typingOff', function(){
 			var typingMark = document.getElementById('someoneTyping');
 			typingMark.style.visibility = 'hidden';
 		})
