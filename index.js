@@ -1,4 +1,4 @@
-/**
+/**`
 * RealTime Chat App
 *
 * @author Ugur Cengiz
@@ -34,7 +34,7 @@ io.on('connection', (socket) => {
 		io.sockets.emit('messageGet', data);
 	});
 
-	socket.on('typing', () => {
+	socket.on('typing', () => {	
 		typers.push(socket.id);
 		console.log(typers.length);
 		socket.broadcast.emit('someoneTyping', true);
@@ -53,7 +53,18 @@ io.on('connection', (socket) => {
 		}
 	});
 
-	/** If typers left only one, disable typing animation for only left typer*/
+	socket.on('disconnect', () => {
+		var removal = typers.indexOf(socket.id);
+		if(removal > -1){
+			typers.splice(removal, 1);
+		}
+
+		if(typers.length == 0){
+			io.sockets.emit('noTyping', true);
+		}
+	})
+
+	/** If typers only one left, disable typing animation for only left typer*/
 	socket.on('checkTypers', function(client){
 		if(typers.length == 1){
 			io.to(typers[0]).emit('typingOff');
