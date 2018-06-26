@@ -77,13 +77,30 @@
 			height: 30px;
 		}
 
+		#notifier{
+			/* v1
+			padding: 20px 65px;
+		    border-radius: 13px;
+		    position: fixed;
+		    bottom: 15px;
+		    right: 10px;
+		    background-color: #8ede98;
+		    font-family: trebuchet ms;*/
+		    width: 100%;
+		    height: 20px;
+		    text-align: center;
+		    position: fixed;
+		    top: 0;
+		    background-color: #8ede98;
+		    font-family: trebuchet ms
+		}
 
 
 	</style>
 	<script type="text/javascript" src="socket.io.js"></script>
 </head>
 <body>
-	<h2 style="font-family: trebuchet ms; text-align: center">RealTime Chat - Github: @ugrcngz35</h2>
+	<h2 style="font-family: trebuchet ms; text-align: center;margin-top:30px;">RealTime Chat - Github: @ugrcngz35</h2>
 	<div id="chat">
 		<div id="chatSide">
 		</div>
@@ -93,6 +110,18 @@
 			<img id="someoneTyping" style="visibility: hidden;" src="typing.gif" height="60">
 		</div>
 	</div>
+	<div id="notifier-wrap"></div>
+	<!-- Additional Functions -->
+	<script type="text/javascript">
+		function joinNotify(dataObject, hideTime = 3000){
+			let i = document.getElementById('notifier-wrap');
+			i.innerHTML = "";
+			i.innerHTML = `<div id="notifier">${dataObject.joinerNick} chat'e katıldı.</div>`;
+			setTimeout(() => {
+				i.innerHTML = "";
+			}, hideTime);
+		}
+	</script>
 	<script type="text/javascript">
 		var nickname;
 		nickname = prompt('Lutfen Nickname giriniz');
@@ -102,6 +131,19 @@
 
 		var socket = io('http://localhost:3000');
 		socket.emit('nickEntered', nickname);
+
+		//Tell server that i joined
+		socket.emit('join', {
+			joiner: nickname
+		});
+
+		//Joiner Notifier
+		socket.on('joinNotify', (data) => {
+			joinNotify(data);
+		} )
+
+
+		////
 
 		var chatSide = document.getElementById('chatSide');
 		var sendButton = document.getElementById('send');
@@ -132,9 +174,9 @@
 
 			lock = false;
 			socket.emit('typingOver', {id: socket.id});
-			socket.emit('checkTypers', {id: socket.id});
 
 			//Checking typers how much left or finding alone one
+			socket.emit('checkTypers', {id: socket.id});
 		});
 
 		socket.on('messageGet', function(data){

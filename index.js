@@ -21,6 +21,7 @@ const io = socket(server);
 
 const colors = ['#673ab7', '#4caf50', '#2196f3', '#9c27b0', '#ff5722', '#795548', '#404040'];
 var typers = [];
+var onlines = [];
 
 io.on('connection', (socket) => {
 	const autocolor = colors[Math.floor(Math.random() * 7)];
@@ -28,6 +29,13 @@ io.on('connection', (socket) => {
 		socket.nickname = data;
 		console.log(socket.nickname + ' katildi');
 	});
+
+	socket.on('join', (data) => {
+		let newbie = {id: socket.id, joinerNick: data.joiner};
+		onlines.push(newbie);
+		console.log(onlines);
+		socket.broadcast.emit('joinNotify', newbie);
+	})
 
 	socket.on('messageSend', (data) => {
 		data['color'] =  autocolor;
@@ -62,6 +70,14 @@ io.on('connection', (socket) => {
 		if(typers.length == 0){
 			io.sockets.emit('noTyping', true);
 		}
+
+		//Remove From Onlines on Disconnect
+		onlines.forEach((value, index) => {
+			if(value.id == socket.id){
+				onlines.splice(index, 1);
+				console.log(onlines);
+			}
+		})
 	})
 
 	/** If typers only one left, disable typing animation for only left typer*/
