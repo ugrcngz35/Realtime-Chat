@@ -1,5 +1,5 @@
 # Realtime-Chat
 SocketIO based realtime chat app
 
-#### Livechat App is live on
-  https://ugurcengiz.com:3000/
+#### Livechat App is available
+  http://ugurcengiz.com:3000
