@@ -2,4 +2,4 @@
 SocketIO based realtime chat app
 
 #### Livechat App is live on
-  http://livechat.gq
+  https://ugurcengiz.com:3000/
